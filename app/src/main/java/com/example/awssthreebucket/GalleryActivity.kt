@@ -25,8 +25,8 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
-        val FileListTV=findViewById<TextView>(R.id.FileListTV);
-        val FileDwnBtn=findViewById<Button>(R.id.FileDwnBtn);
+        val filelisttv=findViewById<TextView>(R.id.FileListTV)
+        val filedwnbtn=findViewById<Button>(R.id.FileDwnBtn)
         val progressBar=findViewById<ProgressBar>(R.id.progressBar)
         Amplify.Storage.list(
             "",
@@ -34,18 +34,18 @@ class GalleryActivity : AppCompatActivity() {
                 GlobalScope.launch(Dispatchers.IO) {
                     val filesTxt = arrayListOf<String>()
                     val files = arrayListOf<String>()
-                    result.getItems().forEach { item ->
-                        Log.d("MyAmplifyApp", "Item: " + item.getKey())
+                    result.items.forEach { item ->
+                        Log.d("MyAmplifyApp", "Item: " + item.key)
                         filesTxt += item.key +" ${(item.size).div(1000)}KB"
                         files += item.key
                     }
                  withContext(Dispatchers.Main){
-                       FileListTV.setText((filesTxt.toString()).replace("]","").replace("[",""))
-                       FileListTV.visibility = View.VISIBLE
+                       filelisttv.text = (filesTxt.toString()).replace("]","").replace("[","")
+                       filelisttv.visibility = View.VISIBLE
 
-                        FileDwnBtn.visibility = View.VISIBLE
+                        filedwnbtn.visibility = View.VISIBLE
 
-                        FileDwnBtn.setOnClickListener {
+                        filedwnbtn.setOnClickListener {
                             progressBar.visibility = View.VISIBLE
                             GlobalScope.launch(Dispatchers.IO){
                                 downloadfiles(files)
@@ -77,7 +77,7 @@ class GalleryActivity : AppCompatActivity() {
             return suspendCoroutine { continuation ->
                 Amplify.Storage.remove(
                     file.origin,
-                    { result -> Log.d("MyAmplifyApp", "Successfully removed: " + result.getKey())
+                    { result -> Log.d("MyAmplifyApp", "Successfully removed: " + result.key)
                         continuation.resume("success")
 
 
@@ -108,13 +108,13 @@ class GalleryActivity : AppCompatActivity() {
 
 
 
-    fun populaterv(list: ArrayList<S3File>){
-        val FileNameTV=findViewById<TextView>(R.id.FileNameTV);
-        val FileRecyclerView=findViewById<RecyclerView>(R.id.FileRecyclerView)
+    private fun populaterv(list: ArrayList<S3File>){
+        val filenametv=findViewById<TextView>(R.id.FileNameTV)
+        val filerecyclerview=findViewById<RecyclerView>(R.id.FileRecyclerView)
         val progressBar=findViewById<ProgressBar>(R.id.progressBar)
         Log.d("downloadlist", list.toString())
-        if (FileNameTV.visibility == View.VISIBLE){
-            FileNameTV.visibility = View.GONE
+        if (filenametv.visibility == View.VISIBLE){
+            filenametv.visibility = View.GONE
         }
 
         if(progressBar.visibility == View.VISIBLE){
@@ -122,7 +122,7 @@ class GalleryActivity : AppCompatActivity() {
         }
 
 
-        FileRecyclerView.apply {
+        filerecyclerview.apply {
             layoutManager = GridLayoutManager(this@GalleryActivity,3)
             adapter = PictureAdapter(this@GalleryActivity, list, this@GalleryActivity)
             (adapter as PictureAdapter).notifyDataSetChanged()
@@ -131,9 +131,9 @@ class GalleryActivity : AppCompatActivity() {
 
     fun downloadprogress(file: String){
 
-        val FileNameTV=findViewById<TextView>(R.id.FileNameTV);
-        FileNameTV.visibility = View.VISIBLE
-        FileNameTV.setText("${file} Downloaded")
+        val filenametv=findViewById<TextView>(R.id.FileNameTV)
+        filenametv.visibility = View.VISIBLE
+        filenametv.text = file//"Downloaded$file"
 
     }
 
@@ -152,7 +152,7 @@ class GalleryActivity : AppCompatActivity() {
                 { progress ->
                     Log.d("MyAmplifyApp", "Fraction completed: ${progress.fractionCompleted}")
                 },
-                { result -> Log.d("MyAmplifyApp", "Successfully downloaded: ${result.getFile().name} Path: ${result.file.absolutePath}")
+                { result -> Log.d("MyAmplifyApp", "Successfully downloaded: ${result.file.name} Path: ${result.file.absolutePath}")
                   //  downloadprogress(result.getFile().name)
 
                     val fileobj = S3File(
@@ -163,7 +163,7 @@ class GalleryActivity : AppCompatActivity() {
                     filepaths += fileobj
                     println("filelists${filepaths.size} ${file.size}")
                     if(filepaths.size == file.size){
-                      //  populaterv(filepaths)
+                        populaterv(filepaths)
                     }
                 },
                 { error -> Log.d("MyAmplifyApp", "Download Failure", error) }

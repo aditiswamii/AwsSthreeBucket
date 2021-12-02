@@ -9,10 +9,10 @@ import com.amplifyframework.core.Amplify.configure
 
 class AmplifyInit (){
 
-    public fun intializeAmplify(Context: Context){
+    fun intializeAmplify(Context: Context){
         try {
-    //        Amplify.addPlugin(AWSCognitoAuthPlugin())
-   //         Amplify.addPlugin(AWSS3StoragePlugin())
+ //           Amplify.addPlugin(AWSCognitoAuthPlugin())
+ //           Amplify.addPlugin(AWSS3StoragePlugin())
             configure(Context)
             Log.d("MyAmplifyApp", "Initialized Amplify")
         } catch (error: AmplifyException) {
